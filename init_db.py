@@ -7,9 +7,8 @@ cursor.execute("""
 CREATE TABLE IF NOT EXISTS system_data (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    cpu_usage REAL,
-    disk_usage REAL,
-    users_connected INTEGER
+    type TEXT,
+    value REAL
 )
 """)
 
