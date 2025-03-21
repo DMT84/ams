@@ -43,4 +43,4 @@ VALUES (?, ?, ?, ?)
 conn.commit()
 conn.close()
 
-print(f"✅ Alerte CERT enregistrée : {alert_id} - {alert_title} - {alert_status}")
+print(f"Alerte CERT enregistrée : {alert_id} - {alert_title} - {alert_status}")
