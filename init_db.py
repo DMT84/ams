@@ -25,4 +25,4 @@ CREATE TABLE IF NOT EXISTS cert_alerts (
 conn.commit()
 conn.close()
 
-print("✅ Base de données initialisée avec succès !")
+print("Base de données initialisée avec succès !")
