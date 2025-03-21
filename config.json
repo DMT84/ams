@@ -1,0 +1,16 @@
+{
+    "sondes": [
+        {
+            "type": "cpu",
+            "script": "sonde_cpu.py"
+        },
+        {
+            "type": "disque",
+            "script": "sonde_disque.py"
+        },
+        {
+            "type": "utilisateurs",
+            "script": "sonde_users.sh"
+        }
+    ]
+}
