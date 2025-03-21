@@ -9,5 +9,5 @@ cursor.execute("DELETE FROM cert_alerts WHERE timestamp < datetime('now', '-7 da
 conn.commit()
 conn.close()
 
-print("🧹 Base nettoyée : données de plus de 7 jours supprimées.")
+print("Base nettoyée : données de plus de 7 jours supprimées.")
 
