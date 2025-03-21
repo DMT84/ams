@@ -15,7 +15,6 @@ cpu_usage = extract_number(cpu_output, r'CPU : ([\d.]+)')
 disk_usage = extract_number(disk_output, r'Disque : ([\d.]+)')
 users_connected = int(extract_number(users_output, r'User : (\d+)'))
 
-# Connexion à la base de données
 conn = sqlite3.connect("monitoring.db")
 cursor = conn.cursor()
 
@@ -38,4 +37,4 @@ VALUES (?, ?)
 conn.commit()
 conn.close()
 
-print(f"✅ Données insérées : CPU {cpu_usage}%, Disque {disk_usage}%, Utilisateurs {users_connected}")
+print(f"Données insérées : CPU {cpu_usage}%, Disque {disk_usage}%, Utilisateurs {users_connected}")
