@@ -15,8 +15,10 @@ CREATE TABLE IF NOT EXISTS system_data (
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS cert_alerts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    alert_text TEXT
+    alert_date TEXT,
+    alert_id TEXT,
+    alert_text TEXT,
+    alert_status TEXT
 )
 """)
 
