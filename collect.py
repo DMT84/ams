@@ -9,7 +9,7 @@ def extract_number(output, regex_pattern):
 
 cpu_output = subprocess.getoutput("python3 sonde_cpu.py")
 disk_output = subprocess.getoutput("python3 sonde_disque.py")
-users_output = subprocess.getoutput("./sonde_users.sh")
+users_output = subprocess.getoutput("./sonde_user.sh")
 
 cpu_usage = extract_number(cpu_output, r'CPU : ([\d.]+)')
 disk_usage = extract_number(disk_output, r'Disque : ([\d.]+)')
