@@ -7,25 +7,33 @@ def extract_number(output, regex_pattern):
     match = re.search(regex_pattern, output)
     return float(match.group(1)) if match else 0
 
-# Exécuter les sondes et récupérer les sorties
 cpu_output = subprocess.getoutput("python3 sonde_cpu.py")
 disk_output = subprocess.getoutput("python3 sonde_disque.py")
 users_output = subprocess.getoutput("./sonde_users.sh")
 
-# Appliquer la regex pour récupérer les valeurs
 cpu_usage = extract_number(cpu_output, r'CPU : ([\d.]+)')
 disk_usage = extract_number(disk_output, r'Disque : ([\d.]+)')
-users_connected = int(extract_number(users_output, r'User : (\d+)'))  # Conversion en entier
+users_connected = int(extract_number(users_output, r'User : (\d+)'))
 
-# Connexion à SQLite
+# Connexion à la base de données
 conn = sqlite3.connect("monitoring.db")
 cursor = conn.cursor()
 
-# Insérer les données dans la base
+# Insertion des données pour chaque sonde avec un type spécifique
 cursor.execute("""
-INSERT INTO system_data (cpu_usage, disk_usage, users_connected)
-VALUES (?, ?, ?)
-""", (cpu_usage, disk_usage, users_connected))
+INSERT INTO system_data (type, value)
+VALUES (?, ?)
+""", ("CPU", cpu_usage))
+
+cursor.execute("""
+INSERT INTO system_data (type, value)
+VALUES (?, ?)
+""", ("Disk", disk_usage))
+
+cursor.execute("""
+INSERT INTO system_data (type, value)
+VALUES (?, ?)
+""", ("Users", users_connected))
 
 conn.commit()
 conn.close()
