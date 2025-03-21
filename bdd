@@ -3,7 +3,6 @@ import sqlite3
 conn = sqlite3.connect("monitoring.db")
 cursor = conn.cursor()
 
-# Création de la table unique pour toutes les sondes
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS system_data (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -14,7 +13,6 @@ CREATE TABLE IF NOT EXISTS system_data (
 )
 """)
 
-# Création de la table pour les alertes CERT
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS cert_alerts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
