@@ -11,7 +11,7 @@ date_alert = soup.find("span", class_="item-date")
 alert_date = date_alert.text.strip() if date_alert else "Date inconnue"
 
 title_div = soup.find("div", class_="item-title")
-alert_link = title_div.find("a")  # Le lien <a> contient l'ID et le titre
+alert_link = title_div.find("a")
 alert_id = alert_link['href'].split('/')[-2] if alert_link else "ID non trouvé"
 alert_title = alert_link.text.strip() if alert_link else "Titre non trouvé"
 
