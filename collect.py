@@ -9,17 +9,15 @@ def extract_number(output, regex_pattern):
 
 cpu_output = subprocess.getoutput("python3 sonde_cpu.py")
 disk_output = subprocess.getoutput("python3 sonde_disque.py")
-users_output = subprocess.getoutput("./sonde_users.sh")
+users_output = subprocess.getoutput("./sonde_user.sh")
 
 cpu_usage = extract_number(cpu_output, r'CPU : ([\d.]+)')
 disk_usage = extract_number(disk_output, r'Disque : ([\d.]+)')
 users_connected = int(extract_number(users_output, r'User : (\d+)'))
 
-# Connexion à la base de données
 conn = sqlite3.connect("monitoring.db")
 cursor = conn.cursor()
 
-# Insertion des données pour chaque sonde avec un type spécifique
 cursor.execute("""
 INSERT INTO system_data (type, value)
 VALUES (?, ?)
@@ -38,4 +36,4 @@ VALUES (?, ?)
 conn.commit()
 conn.close()
 
-print(f"✅ Données insérées : CPU {cpu_usage}%, Disque {disk_usage}%, Utilisateurs {users_connected}")
+print(f"Données insérées : CPU {cpu_usage}%, Disque {disk_usage}%, Utilisateurs {users_connected}")
