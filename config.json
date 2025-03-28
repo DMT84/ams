@@ -1,16 +1,19 @@
 {
-    "sondes": [
-        {
-            "type": "cpu",
-            "script": "sonde_cpu.py"
-        },
-        {
-            "type": "disque",
-            "script": "sonde_disque.py"
-        },
-        {
-            "type": "utilisateurs",
-            "script": "sonde_user.sh"
-        }
-    ]
+  "sondes": [
+    {
+      "type": "cpu",
+      "script": "cpu.sh",
+      "seuil": 90
+    },
+    {
+      "type": "disque",
+      "script": "disque.sh",
+      "seuil": 80
+    },
+    {
+      "type": "utilisateurs",
+      "script": "utilisateurs.sh",
+      "seuil": 10
+    }
+  ]
 }
