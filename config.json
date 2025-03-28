@@ -1,16 +1,16 @@
 {
-  "sondes": [
-    {
-      "type": "cpu",
-      "script": "cpu.sh",
-    },
-    {
-      "type": "disque",
-      "script": "disque.sh",
-    },
-    {
-      "type": "utilisateurs",
-      "script": "utilisateurs.sh",
-    }
-  ]
+    "sondes": [
+        {
+            "type": "cpu",
+            "script": "sonde_cpu.py"
+        },
+        {
+            "type": "disque",
+            "script": "sonde_disque.py"
+        },
+        {
+            "type": "utilisateurs",
+            "script": "sonde_user.sh"
+        }
+    ]
 }
