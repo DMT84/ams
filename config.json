@@ -3,17 +3,14 @@
     {
       "type": "cpu",
       "script": "cpu.sh",
-      "seuil": 90
     },
     {
       "type": "disque",
       "script": "disque.sh",
-      "seuil": 80
     },
     {
       "type": "utilisateurs",
       "script": "utilisateurs.sh",
-      "seuil": 10
     }
   ]
 }
