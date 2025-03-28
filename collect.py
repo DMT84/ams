@@ -2,7 +2,8 @@ import json
 import subprocess
 import sqlite3
 import re
-import time  # Ajouter cette importation pour la gestion des intervalles
+import time
+import os
 
 def extract_number(output, regex_pattern):
     match = re.search(regex_pattern, output)
@@ -16,10 +17,19 @@ def collect_data():
     cursor = conn.cursor()
 
     for sonde in config['sondes']:
-        # Exécuter le script associé à la sonde
-        output = subprocess.getoutput(f"python3 {sonde['script']}" if sonde['script'].endswith('.py') else sonde['script'])
+        script_path = sonde['script']
 
-        # Traiter la sortie en fonction du type de sonde
+        # Détecte le type de fichier automatiquement
+        if script_path.endswith('.py'):
+            cmd = f"python3 {script_path}"
+        elif script_path.endswith('.sh'):
+            cmd = f"bash {script_path}"
+        else:
+            print(f"Format de script non pris en charge : {script_path}")
+            continue
+
+        output = subprocess.getoutput(cmd)
+
         if sonde['type'] == 'cpu':
             cpu_usage = extract_number(output, r'CPU : ([\d.]+)')
             cursor.execute("INSERT INTO system_data (type, value) VALUES (?, ?)", ('cpu', cpu_usage))
@@ -30,13 +40,14 @@ def collect_data():
             users_connected = int(extract_number(output, r'User : (\d+)'))
             cursor.execute("INSERT INTO system_data (type, value) VALUES (?, ?)", ('utilisateurs', users_connected))
 
+        print(f"Donnée insérée pour {sonde['type']}")
+
     conn.commit()
     conn.close()
 
-    print("Données insérées avec succès !")
+    print("Toutes les données ont été insérées avec succès !")
 
-# Exécution du script à intervalles réguliers (toutes les 2 minutes)
 while True:
     collect_data()
-    print("Attente de 2 minutes...")
-    time.sleep(120)  # Attend 2 minutes (120 secondes) avant de relancer l'exécution
+    print("⏳ Attente de 2 minutes...")
+    time.sleep(120)
