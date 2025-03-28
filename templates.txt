@@ -1,0 +1,6 @@
+Alerte de crise détectée !
+
+{{message}}
+
+Merci de vérifier rapidement la machine.
+Service Monitoring
