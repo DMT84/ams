@@ -49,5 +49,5 @@ def collect_data():
 
 while True:
     collect_data()
-    print("⏳ Attente de 2 minutes...")
+    print("Attente de 2 minutes...")
     time.sleep(120)
