@@ -20,7 +20,16 @@ os.makedirs(BACKUP_DIR, exist_ok=True)
 
 def extract_number(output):
     match = re.search(r'([\d.]+)', output)
-    return float(match.group(1)) if match else 0
+    # Vérifier si un nombre a bien été trouvé
+    if match:
+        try:
+            return float(match.group(1))  # Convertir en float
+        except ValueError:
+            print(f"Erreur de conversion du nombre: {match.group(1)}")
+            return None  # Retourner None si la conversion échoue
+    else:
+        print("Aucun nombre trouvé dans la sortie")
+        return None  # Retourner None si aucun nombre n'est trouvé
 
 def load_config():
     with open(os.path.join(BASE_DIR, "config.json")) as f:
@@ -59,13 +68,16 @@ def init_rrd(sonde_type):
 def update_rrd(sonde_type, value):
     path = os.path.join(DATA_DIR, f"{sonde_type}.rrd")
     if os.path.exists(path):
-        # Mise à jour du fichier RRD via subprocess
-        command = [
-            "rrdtool", "update", path,
-            f"{int(time.time())}:{value}"
-        ]
-        subprocess.run(command)
-        print(f"Valeur mise à jour dans RRD pour {sonde_type}: {value}")
+        if value is not None:  # Vérifier que la valeur est valide avant de l'ajouter
+            # Mise à jour du fichier RRD via subprocess
+            command = [
+                "rrdtool", "update", path,
+                f"{int(time.time())}:{value}"
+            ]
+            subprocess.run(command)
+            print(f"Valeur mise à jour dans RRD pour {sonde_type}: {value}")
+        else:
+            print(f"Valeur non valide pour {sonde_type}, mise à jour RRD ignorée.")
     else:
         print(f"Fichier RRD pour {sonde_type} introuvable.")
 
@@ -100,17 +112,20 @@ def collect_data():
         )
         value = extract_number(output)
 
-        cursor.execute("INSERT INTO system_data (type, value) VALUES (?, ?)", (sonde['type'], value))
-        conn.commit()
-        
-        init_rrd(sonde['type'])
-        update_rrd(sonde['type'], value)
+        if value is not None:  # Vérifier que la valeur est valide avant de l'insérer
+            cursor.execute("INSERT INTO system_data (type, value) VALUES (?, ?)", (sonde['type'], value))
+            conn.commit()
 
-        seuil = sonde.get("seuil", 100)
-        if value >= seuil:
-            msg = f"Sonde {sonde['type']} - Valeur critique détectée : {value}% (seuil : {seuil}%)"
-            print(msg)
-            send_email(msg)
+            init_rrd(sonde['type'])
+            update_rrd(sonde['type'], value)
+
+            seuil = sonde.get("seuil", 100)
+            if value >= seuil:
+                msg = f"Sonde {sonde['type']} - Valeur critique détectée : {value}% (seuil : {seuil}%)"
+                print(msg)
+                send_email(msg)
+        else:
+            print(f"Valeur invalide pour la sonde {sonde['type']}, données non insérées.")
 
     conn.close()
 
