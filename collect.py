@@ -9,16 +9,17 @@ def extract_number(output, regex_pattern):
     return float(match.group(1)) if match else 0
 
 def collect_data():
-    with open('config.json', 'r') as f:
+    base_path = "/home/cristiano/projet/ams"  # Ton chemin absolu
+
+    with open(os.path.join(base_path, 'config.json'), 'r') as f:
         config = json.load(f)
 
-    conn = sqlite3.connect("monitoring.db")
+    conn = sqlite3.connect(os.path.join(base_path, "monitoring.db"))
     cursor = conn.cursor()
 
     for sonde in config['sondes']:
-        script_path = sonde['script']
+        script_path = os.path.join(base_path, sonde['script'])
 
-        # Détecte le type de fichier automatiquement
         if script_path.endswith('.py'):
             cmd = f"python3 {script_path}"
         elif script_path.endswith('.sh'):
@@ -29,7 +30,7 @@ def collect_data():
 
         output = subprocess.getoutput(cmd)
 
-        # Traitement selon le type
+        # Traitement
         if sonde['type'] == 'cpu':
             cpu_usage = extract_number(output, r'CPU : ([\d.]+)')
             cursor.execute("INSERT INTO system_data (type, value) VALUES (?, ?)", ('cpu', cpu_usage))
@@ -44,8 +45,6 @@ def collect_data():
 
     conn.commit()
     conn.close()
-
     print("Toutes les données ont été insérées avec succès !")
 
-# Lancement
 collect_data()
