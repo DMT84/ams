@@ -2,7 +2,6 @@ import json
 import subprocess
 import sqlite3
 import re
-import time
 import os
 
 def extract_number(output, regex_pattern):
@@ -19,6 +18,7 @@ def collect_data():
     for sonde in config['sondes']:
         script_path = sonde['script']
 
+        # Détecte le type de fichier automatiquement
         if script_path.endswith('.py'):
             cmd = f"python3 {script_path}"
         elif script_path.endswith('.sh'):
@@ -29,6 +29,7 @@ def collect_data():
 
         output = subprocess.getoutput(cmd)
 
+        # Traitement selon le type
         if sonde['type'] == 'cpu':
             cpu_usage = extract_number(output, r'CPU : ([\d.]+)')
             cursor.execute("INSERT INTO system_data (type, value) VALUES (?, ?)", ('cpu', cpu_usage))
@@ -46,7 +47,5 @@ def collect_data():
 
     print("Toutes les données ont été insérées avec succès !")
 
-while True:
-    collect_data()
-    print("Attente de 2 minutes...")
-    time.sleep(120)
+# Lancement
+collect_data()
