@@ -5,7 +5,6 @@ import re
 import os
 import smtplib
 from email.mime.text import MIMEText
-import pyrrd.rrd as rrd
 import time
 import argparse
 import tarfile
@@ -47,20 +46,28 @@ def send_email(message):
 def init_rrd(sonde_type):
     path = os.path.join(DATA_DIR, f"{sonde_type}.rrd")
     if not os.path.exists(path):
-        rrdtool = rrd.RRD(
-            filename=path,
-            step=60,
-            ds=[rrd.DataSource(dsName='value', dsType='GAUGE', heartbeat=120)],
-            rra=[rrd.RRA(cf='AVERAGE', xff=0.5, steps=1, rows=1440)]
-        )
-        rrdtool.create(debug=False)
+        # Création du fichier RRD avec rrdtool via subprocess
+        command = [
+            "rrdtool", "create", path,
+            "--step", "60",
+            "DS:value:GAUGE:120:0:U",
+            "RRA:AVERAGE:0.5:1:1440"
+        ]
+        subprocess.run(command)
+        print(f"Fichier RRD créé pour {sonde_type}")
 
 def update_rrd(sonde_type, value):
     path = os.path.join(DATA_DIR, f"{sonde_type}.rrd")
     if os.path.exists(path):
-        rrdtool = rrd.RRD(filename=path)
-        rrdtool.bufferValue(str(int(time.time())), str(value))
-        rrdtool.update(debug=False)
+        # Mise à jour du fichier RRD via subprocess
+        command = [
+            "rrdtool", "update", path,
+            f"{int(time.time())}:{value}"
+        ]
+        subprocess.run(command)
+        print(f"Valeur mise à jour dans RRD pour {sonde_type}: {value}")
+    else:
+        print(f"Fichier RRD pour {sonde_type} introuvable.")
 
 def backup():
     backup_name = os.path.join(BACKUP_DIR, f"backup_{int(time.time())}.tar.gz")
