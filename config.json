@@ -10,7 +10,7 @@
         },
         {
             "type": "utilisateurs",
-            "script": "sonde_users.sh"
+            "script": "sonde_user.sh"
         }
     ]
 }
