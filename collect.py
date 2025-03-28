@@ -9,7 +9,7 @@ def extract_number(output, regex_pattern):
     return float(match.group(1)) if match else 0
 
 def collect_data():
-    base_path = "/home/cristiano/projet/ams"  # Ton chemin absolu
+    base_path = "/home/cristiano/projet/ams"  
 
     with open(os.path.join(base_path, 'config.json'), 'r') as f:
         config = json.load(f)
