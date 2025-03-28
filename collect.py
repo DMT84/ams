@@ -19,7 +19,6 @@ def collect_data():
     for sonde in config['sondes']:
         script_path = sonde['script']
 
-        # Détecte le type de fichier automatiquement
         if script_path.endswith('.py'):
             cmd = f"python3 {script_path}"
         elif script_path.endswith('.sh'):
