@@ -10,7 +10,7 @@ def extract_number(output, regex_pattern):
     return float(match.group(1)) if match else 0
 
 def collect_data():
-    base_path = "/home/cristiano/projet/ams"  # Ton chemin absolu
+    base_path = "/home/cristiano/projet/ams"  
 
     with open(os.path.join(base_path, 'config.json'), 'r') as f:
         config = json.load(f)
@@ -50,19 +50,18 @@ def collect_data():
 collect_data()
 
 def backup_database():
-    base_path = "/home/cristiano/projet/ams"  # Ton chemin absolu
+    base_path = "/home/cristiano/projet/ams"  
     db_path = os.path.join(base_path, "monitoring.db")
     backup_path = os.path.join(base_path, "monitoring_backup.db")
 
     try:
-        # Copie la base de données vers un fichier de sauvegarde
         shutil.copy2(db_path, backup_path)
         print(f"Base de données sauvegardée sous {backup_path}")
     except Exception as e:
         print(f"Erreur lors de la sauvegarde de la base de données: {e}")
 
 def restore_database():
-    base_path = "/home/cristiano/projet/ams"  # Ton chemin absolu
+    base_path = "/home/cristiano/projet/ams" 
     db_path = os.path.join(base_path, "monitoring.db")
     backup_path = os.path.join(base_path, "monitoring_backup.db")
 
