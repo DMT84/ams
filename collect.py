@@ -33,19 +33,10 @@ def collect_data():
             continue
 
         output = subprocess.getoutput(cmd)
-
-        if sonde['type'] == 'cpu':
-            cpu_usage = extract_number(output, r'CPU : ([\d.]+)')
-            cursor.execute("INSERT INTO system_data (type, value) VALUES (?, ?)", ('cpu', cpu_usage))
-        elif sonde['type'] == 'disque':
-            disk_usage = extract_number(output, r'Disque : ([\d.]+)')
-            cursor.execute("INSERT INTO system_data (type, value) VALUES (?, ?)", ('disque', disk_usage))
-        elif sonde['type'] == 'utilisateurs':
-            users_connected = int(extract_number(output, r'User : (\d+)'))
-            cursor.execute("INSERT INTO system_data (type, value) VALUES (?, ?)", ('utilisateurs', users_connected))
-
-        print(f"Donnée insérée pour {sonde['type']}")
-
+        valeur = extract_number(output, r'([\d.]+)')
+        cursor.execute("INSERT INTO system_data (type, value) VALUES (?, ?)", (sonde['type'], valeur))
+        print(f"Donnée insérée pour {sonde['type']} : {valeur}")
+    
     conn.commit()
     conn.close()
     print("Toutes les données ont été insérées avec succès !")
@@ -75,8 +66,8 @@ def restore_database():
         print(f"Erreur lors de la restauration de la base de données: {e}")
 
 def envoyer_alerte(sujet, message):
-    sender_email = "nathan.bartier@alumni.univ-avignon.fr"
-    receiver_email = "nathan.bartier@alumni.univ-avignon.fr"
+    sender_email = "dimitri.botella@alumni.univ-avignon.fr"
+    receiver_email = "dimitri.botella@alumni.univ-avignon.fr"
     smtp_server = "partage.univ-avignon.fr"
     smtp_port = 465
     username = sender_email
@@ -106,12 +97,11 @@ def verifier_alertes():
 
     alertes = {
         "cpu": (90, "Alerte CPU", "Le CPU est utilisé à {valeur}%"),
-        "disque": (95, "Alerte Disque Plein", "Le disque est utilisé à {valeur}%"),
-        "ram": (90, "Alerte RAM Saturée", "La RAM est utilisée à {valeur}%")
+        "disque": (95, "Alerte Disque Plein", "Le disque est utilisé à {valeur}%")
     }
 
     for sonde, (seuil, sujet, message) in alertes.items():
-        cursor.execute("SELECT valeur FROM system_data WHERE type=? ORDER BY timestamp DESC LIMIT 1", (sonde,))
+        cursor.execute("SELECT value FROM system_data WHERE type=? ORDER BY rowid DESC LIMIT 1", (sonde,))
         result = cursor.fetchone()
         
         if result and result[0] >= seuil:
