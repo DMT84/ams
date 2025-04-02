@@ -4,6 +4,9 @@ import sqlite3
 import re
 import os
 import shutil  
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 def extract_number(output, regex_pattern):
     match = re.search(regex_pattern, output)
@@ -70,3 +73,52 @@ def restore_database():
         print(f"Base de données restaurée à partir de {backup_path}")
     except Exception as e:
         print(f"Erreur lors de la restauration de la base de données: {e}")
+
+def envoyer_alerte(sujet, message):
+    sender_email = "nathan.bartier@alumni.univ-avignon.fr"
+    receiver_email = "nathan.bartier@alumni.univ-avignon.fr"
+    smtp_server = "partage.univ-avignon.fr"
+    smtp_port = 465
+    username = sender_email
+    password = os.getenv("SMTP_PASSWORD")  # Stocke le mot de passe en variable d'environnement
+
+    msg = MIMEMultipart()
+    msg["From"] = sender_email
+    msg["To"] = receiver_email
+    msg["Subject"] = sujet
+    msg.attach(MIMEText(message, "plain"))
+
+    try:
+        server = smtplib.SMTP_SSL(smtp_server, smtp_port)
+        server.login(username, password)
+        server.sendmail(sender_email, receiver_email, msg.as_string())
+        server.quit()
+        print("Alerte envoyée avec succès.")
+    except Exception as e:
+        print(f"Erreur lors de l'envoi de l'alerte : {e}")
+
+def verifier_alertes():
+    base_path = "/home/cristiano/projet/ams"
+    db_path = os.path.join(base_path, "monitoring.db")
+    
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    alertes = {
+        "cpu": (90, "Alerte CPU", "Le CPU est utilisé à {valeur}%"),
+        "disque": (95, "Alerte Disque Plein", "Le disque est utilisé à {valeur}%"),
+        "ram": (90, "Alerte RAM Saturée", "La RAM est utilisée à {valeur}%")
+    }
+
+    for sonde, (seuil, sujet, message) in alertes.items():
+        cursor.execute("SELECT valeur FROM system_data WHERE type=? ORDER BY timestamp DESC LIMIT 1", (sonde,))
+        result = cursor.fetchone()
+        
+        if result and result[0] >= seuil:
+            envoyer_alerte(sujet, message.format(valeur=result[0]))
+            print(f"Alerte envoyée pour {sonde} à {result[0]}%")
+
+    conn.close()
+
+if __name__ == "__main__":
+    verifier_alertes()
