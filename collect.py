@@ -8,13 +8,11 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-# === Config globale ===
 BASE_PATH = "/home/cristiano/projet/ams"
 DB_PATH = os.path.join(BASE_PATH, "monitoring.db")
 BACKUP_PATH = os.path.join(BASE_PATH, "monitoring_backup.db")
 CONFIG_PATH = os.path.join(BASE_PATH, "config.json")
 
-# === Utilitaires ===
 def extract_number(output, regex_pattern):
     match = re.search(regex_pattern, output)
     return float(match.group(1)) if match else 0
@@ -22,19 +20,19 @@ def extract_number(output, regex_pattern):
 def backup_database():
     try:
         shutil.copy2(DB_PATH, BACKUP_PATH)
-        print(f"✅ Base de données sauvegardée sous {BACKUP_PATH}")
+        print(f"Base de données sauvegardée sous {BACKUP_PATH}")
     except Exception as e:
-        print(f"❌ Erreur sauvegarde DB: {e}")
+        print(f"Erreur sauvegarde DB: {e}")
 
 def restore_database():
     if os.path.exists(BACKUP_PATH):
         try:
             shutil.copy2(BACKUP_PATH, DB_PATH)
-            print(f"♻️  Base restaurée depuis {BACKUP_PATH}")
+            print(f"Base restaurée depuis {BACKUP_PATH}")
         except Exception as e:
-            print(f"❌ Erreur restauration DB: {e}")
+            print(f"Erreur restauration DB: {e}")
     else:
-        print("⚠️  Aucun backup trouvé pour restaurer.")
+        print("Aucun backup trouvé pour restaurer.")
 
 def envoyer_alerte(sujet, message):
     sender_email = "dimitri.botella@alumni.univ-avignon.fr"
@@ -55,9 +53,9 @@ def envoyer_alerte(sujet, message):
         server.login(username, password)
         server.sendmail(sender_email, receiver_email, msg.as_string())
         server.quit()
-        print("📧 Alerte envoyée avec succès.")
+        print("Alerte envoyée avec succès.")
     except Exception as e:
-        print(f"❌ Erreur alerte email: {e}")
+        print(f"Erreur alerte email: {e}")
 
 def verifier_alertes():
     try:
@@ -75,11 +73,11 @@ def verifier_alertes():
 
             if result and result[0] >= seuil:
                 envoyer_alerte(sujet, message.format(valeur=result[0]))
-                print(f"🚨 Alerte envoyée pour {sonde} à {result[0]}%")
+                print(f"Alerte envoyée pour {sonde} à {result[0]}%")
 
         conn.close()
     except Exception as e:
-        print(f"❌ Erreur vérification alertes : {e}")
+        print(f"Erreur vérification alertes : {e}")
 
 def collect_data():
     with open(CONFIG_PATH, 'r') as f:
@@ -96,19 +94,18 @@ def collect_data():
         elif script_path.endswith('.sh'):
             cmd = f"bash {script_path}"
         else:
-            print(f"⚠️ Format non supporté : {script_path}")
+            print(f"Format non supporté : {script_path}")
             continue
 
         output = subprocess.getoutput(cmd)
         valeur = extract_number(output, r'([\d.]+)')
         cursor.execute("INSERT INTO system_data (type, value) VALUES (?, ?)", (sonde['type'], valeur))
-        print(f"📥 Donnée insérée pour {sonde['type']} : {valeur}")
+        print(f"Donnée insérée pour {sonde['type']} : {valeur}")
 
     conn.commit()
     conn.close()
-    print("✅ Collecte terminée.")
+    print("Collecte terminée.")
 
-# === Lancement intelligent ===
 def database_ready():
     try:
         if not os.path.exists(DB_PATH):
@@ -122,7 +119,7 @@ def database_ready():
 
 if __name__ == "__main__":
     if not database_ready():
-        print("🛠 Base non fonctionnelle. Restauration en cours...")
+        print("Base non fonctionnelle. Restauration en cours...")
         restore_database()
 
     collect_data()
