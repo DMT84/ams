@@ -48,12 +48,6 @@ def run_backup():
     except Exception as e:
         print(f"Erreur lancement backup.py : {e}")
 
-def run_restore():
-    try:
-        subprocess.run(["python3", os.path.join(BASE_PATH, "restaure_db.py")])  # Appel du script restore.py
-        print("Restauration terminée.")
-    except Exception as e:
-        print(f"Erreur lancement restore.py : {e}")
 def run_alert_check():
     try:
         subprocess.run(["python3", os.path.join(BASE_PATH, "check_alerts.py")])
@@ -63,6 +57,5 @@ def run_alert_check():
 
 if __name__ == "__main__":
     collect_data()
-    run_restore()
     run_backup()
     run_alert_check()
