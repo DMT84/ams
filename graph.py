@@ -2,7 +2,7 @@ import sqlite3
 import pygal
 import os
 
-conn = sqlite3.connect("/home/cristiano/projet/ams/monitoring.db")  # Modifie le chemin selon ton installation
+conn = sqlite3.connect("/home/cristiano/projet/ams/monitoring.db")
 cursor = conn.cursor()
 
 output_dir = "/mnt/graph"
@@ -10,14 +10,12 @@ os.makedirs(output_dir, exist_ok=True)
 
 html_output = os.path.join(output_dir, "graphiques_sondes.html")
 with open(html_output, 'w') as f:
-    # Ajouter la structure de base du fichier HTML
     f.write("<html><head><title>Graphiques des sondes</title></head><body>\n")
     f.write("<h1>Graphiques des sondes</h1>\n")
     
     sondes = ["cpu", "disque", "user"]
 
     for sonde in sondes:
-        # Récupérer les valeurs de la sonde dans la base de données
         cursor.execute("SELECT timestamp, valeur FROM monitoring WHERE sonde = ?", (sonde,))
         data = cursor.fetchall()
         
