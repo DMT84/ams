@@ -16,7 +16,6 @@ def envoyer_alerte(sujet, sonde, valeur, seuil):
     username = sender_email
     password = os.getenv("SMTP_PASSWORD")
 
-    # Lire le template d'e-mail
     try:
         with open(TEMPLATE_PATH, 'r') as f:
             template = f.read()
@@ -25,7 +24,6 @@ def envoyer_alerte(sujet, sonde, valeur, seuil):
         print(f"Erreur lecture template : {e}")
         message = f"Alerte sur la sonde {sonde} : {valeur}% (seuil : {seuil}%)"
 
-    # Préparer et envoyer l'e-mail
     msg = MIMEMultipart()
     msg["From"] = sender_email
     msg["To"] = receiver_email
