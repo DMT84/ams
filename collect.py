@@ -43,14 +43,14 @@ def collect_data():
     
 def run_backup():
     try:
-        subprocess.run(["python3", os.path.join(BASE_PATH, "backup.py")])  # Appel du script backup.py
+        subprocess.run(["python3", os.path.join(BASE_PATH, "backup_db.py")])  # Appel du script backup.py
         print("Sauvegarde terminée.")
     except Exception as e:
         print(f"Erreur lancement backup.py : {e}")
 
 def run_restore():
     try:
-        subprocess.run(["python3", os.path.join(BASE_PATH, "restore.py")])  # Appel du script restore.py
+        subprocess.run(["python3", os.path.join(BASE_PATH, "restaure_db.py")])  # Appel du script restore.py
         print("Restauration terminée.")
     except Exception as e:
         print(f"Erreur lancement restore.py : {e}")
