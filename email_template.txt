@@ -1,0 +1,9 @@
+ALERTE SUR LA SONDE {sonde}
+
+Le système a détecté un dépassement de seuil critique :
+
+Sonde       : {sonde}
+Valeur      : {valeur}%
+Seuil fixé  : {seuil}%
+
+Merci de consulter le système de monitoring pour plus d'informations.
