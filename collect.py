@@ -12,6 +12,7 @@ BASE_PATH = "/home/cristiano/projet/ams"
 DB_PATH = os.path.join(BASE_PATH, "monitoring.db")
 BACKUP_PATH = os.path.join(BASE_PATH, "monitoring_backup.db")
 CONFIG_PATH = os.path.join(BASE_PATH, "config.json")
+TEMPLATE_PATH = os.path.join(BASE_PATH, "email_template.txt")
 
 def extract_number(output, regex_pattern):
     match = re.search(regex_pattern, output)
@@ -34,7 +35,7 @@ def restore_database():
     else:
         print("Aucun backup trouvé pour restaurer.")
 
-def envoyer_alerte(sujet, message):
+def envoyer_alerte(sujet, sonde, valeur, seuil):
     sender_email = "dimitri.botella@alumni.univ-avignon.fr"
     receiver_email = "dimitri.botella@alumni.univ-avignon.fr"
     smtp_server = "partage.univ-avignon.fr"
@@ -42,6 +43,16 @@ def envoyer_alerte(sujet, message):
     username = sender_email
     password = os.getenv("SMTP_PASSWORD")
 
+    # Lire le template d'e-mail
+    try:
+        with open(TEMPLATE_PATH, 'r') as f:
+            template = f.read()
+        message = template.format(sonde=sonde, valeur=valeur, seuil=seuil)
+    except Exception as e:
+        print(f"Erreur lecture template : {e}")
+        message = f"Alerte sur la sonde {sonde} : {valeur}% (seuil : {seuil}%)"
+
+    # Préparer et envoyer l'e-mail
     msg = MIMEMultipart()
     msg["From"] = sender_email
     msg["To"] = receiver_email
@@ -63,16 +74,16 @@ def verifier_alertes():
         cursor = conn.cursor()
 
         alertes = {
-            "cpu": (90, "Alerte CPU", "Le CPU est utilisé à {valeur}%"),
-            "disque": (95, "Alerte Disque Plein", "Le disque est utilisé à {valeur}%")
+            "cpu": (90, "Alerte CPU"),
+            "disque": (95, "Alerte Disque Plein")
         }
 
-        for sonde, (seuil, sujet, message) in alertes.items():
+        for sonde, (seuil, sujet) in alertes.items():
             cursor.execute("SELECT value FROM system_data WHERE type=? ORDER BY rowid DESC LIMIT 1", (sonde,))
             result = cursor.fetchone()
 
             if result and result[0] >= seuil:
-                envoyer_alerte(sujet, message.format(valeur=result[0]))
+                envoyer_alerte(sujet, sonde, result[0], seuil)
                 print(f"Alerte envoyée pour {sonde} à {result[0]}%")
 
         conn.close()
@@ -94,7 +105,7 @@ def collect_data():
         elif script_path.endswith('.sh'):
             cmd = f"bash {script_path}"
         else:
-            print(f"Format non supporté : {script_path}")
+            print(f"⚠ Format non supporté : {script_path}")
             continue
 
         output = subprocess.getoutput(cmd)
