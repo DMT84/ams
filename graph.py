@@ -3,21 +3,17 @@ import pygal
 import os
 from pathlib import Path
 
-# Connexion à la base de données
 conn = sqlite3.connect("/home/cristiano/projet/ams/monitoring.db")
 cursor = conn.cursor()
 
-# Dossier de sortie pour les graphes
 output_dir = Path("/home/cristiano/projet/ams/graphs")
 output_dir.mkdir(parents=True, exist_ok=True)
 
-# Chemin du fichier HTML de sortie
 html_output = output_dir / "graphiques_sondes.html"
 with open(html_output, 'w') as f:
     f.write("<html><head><title>Graphiques des sondes</title></head><body>\n")
     f.write("<h1>Graphiques des sondes</h1>\n")
     
-    # Liste des sondes
     sondes = ["cpu", "disque", "user"]
 
     for sonde in sondes:
@@ -36,9 +32,27 @@ with open(html_output, 'w') as f:
             line_chart.render_to_file(output_file)
             print(f"Graphique pour {sonde} enregistré sous {output_file}")
 
-            # 👉 Ajout du bon chemin pour Flask
+            # Ajout du graphique SVG
             f.write(f"<h2>Graphique de la sonde {sonde}</h2>\n")
             f.write(f'<object data="/graphs/{os.path.basename(output_file)}" type="image/svg+xml" width="600" height="400"></object>\n')
+
+    f.write("<h2>Tableau des alertes</h2>\n")
+    f.write("<table border='1' cellpadding='5' cellspacing='0'>\n")
+    f.write("<tr><th>Date</th><th>ID</th><th>Texte</th><th>Statut</th></tr>\n")
+
+    cursor.execute("SELECT alert_date, alert_id, alert_text, alert_status FROM cert_alerts ORDER BY alert_date DESC")
+    alerts = cursor.fetchall()
+
+    if alerts:
+        for alert in alerts:
+            f.write("<tr>")
+            for col in alert:
+                f.write(f"<td>{col}</td>")
+            f.write("</tr>\n")
+    else:
+        f.write("<tr><td colspan='4'>Aucune alerte trouvée</td></tr>\n")
+
+    f.write("</table>\n")
 
     f.write("</body></html>\n")
 
