@@ -3,11 +3,15 @@ import os
 
 app = Flask(__name__)
 
+# 👉 Sert le fichier HTML principal
 @app.route('/')
 def afficher_graphiques():
-    # Renvoie le fichier HTML généré dans 'static/'
     return send_from_directory('graphs', 'graphiques_sondes.html')
 
+# 👉 Sert les fichiers SVG depuis le dossier 'graphs'
+@app.route('/graphs/<path:filename>')
+def servir_graph(filename):
+    return send_from_directory('graphs', filename)
+
 if __name__ == '__main__':
-    # Active le mode débogage pour avoir plus de détails sur les erreurs
     app.run(host='0.0.0.0', port=7777, debug=True)
