@@ -4,7 +4,6 @@
 
 Ce projet a pour objectif de développer une plateforme de surveillance d'un parc informatique. Il permet à l'administrateur système de surveiller en temps réel l'état des serveurs et de recevoir des alertes en cas de situations critiques, telles que :
 
-- Serveur inactif depuis plus de 30 minutes.
 - Disque dur plein à 100%.
 - Utilisation de la RAM à 100%.
 
